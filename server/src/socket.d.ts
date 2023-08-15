@@ -1,13 +1,14 @@
 import { Socket } from "socket.io";
+import { Game } from "./game";
 
 declare global {
   interface ServerToClientEvents {
-    board: (board: SocketData.gamingRoom.board) => void;
-    "game start": (roomName: SocketData["gamingRoom"]["name"]) => void;
+    board: (board: Game["board"]) => void;
+    "game start": (room: Game["room"]) => void;
   }
 
   interface ClientToServerEvents {
-    turn: (this: SocketType, turn: string) => void;
+    turn: (turn: string) => void;
     "join game": (this: SocketType) => void;
   }
 
@@ -15,14 +16,7 @@ declare global {
     ping: () => void;
   }
 
-  interface SocketData {
-    gamingRoom: {
-      name: string;
-      sockets: SocketType[];
-      board: SocketData["sign"][];
-    };
-    sign: "X" | "O" | "";
-  }
+  interface SocketData {}
 
   type SocketType = Socket<
     ClientToServerEvents,
