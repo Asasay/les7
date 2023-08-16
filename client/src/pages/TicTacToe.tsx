@@ -3,12 +3,23 @@ import { Socket } from "socket.io-client";
 
 const TicTacToe = ({ socket }: { socket: Socket }) => {
   const [gameStarted, setGameStarted] = useState(false);
-  const [board, setBoard] = useState(() => new Array(9).fill(""));
+  const [gameOver, setGameOver] = useState(false);
+  const [myTurn, setMyTurn] = useState("Waiting for another player to move");
+  const [board, setBoard] = useState<string[][]>(() => [
+    ["", "", ""],
+    ["", "", ""],
+    ["", "", ""],
+  ]);
 
   useEffect(() => {
     socket.emit("join game");
     socket.once("game start", () => setGameStarted(true));
     socket.on("board", (board) => setBoard(board));
+    socket.on("your turn", () => setMyTurn("Your turn!"));
+    socket.on("game over", (outcome) => {
+      setMyTurn(outcome);
+      setGameOver(true);
+    });
     return () => {
       socket.off();
     };
@@ -19,27 +30,32 @@ const TicTacToe = ({ socket }: { socket: Socket }) => {
       return (
         <div>
           <div className="grid grid-cols-3 grid-rows-3 border border-black">
-            {board.map((el, i) => (
-              <button
-                className="border border-black min-h-[100px] min-w-[100px] text-2xl"
-                key={i}
-                onClick={() => {
-                  if (board[i] != "") return;
-                  else socket.emit("turn", i);
-                }}
-              >
-                {el}
-              </button>
-            ))}
+            {board.flatMap((innerArray, i) =>
+              innerArray.map((cell, k) => (
+                <button
+                  className="min-h-[100px] min-w-[100px] border border-black text-2xl"
+                  key={i * 3 + k}
+                  onClick={() => {
+                    if (board[i][k] != "" || gameOver) return;
+                    else {
+                      socket.emit("turn", i * 3 + k);
+                      setMyTurn("Waiting for another player to move");
+                    }
+                  }}
+                >
+                  {cell}
+                </button>
+              ))
+            )}
           </div>
-          <p className="text-lg  mt-3">{"Your turn!"}</p>
+          <p className="mt-3 text-lg">{myTurn}</p>
         </div>
       );
     else
       return (
         <div>
-          <div className="absolute right-1/2 bottom-1/2  transform translate-x-1/2 translate-y-1/2 ">
-            <div className="border-t-transparent border-solid animate-spin  rounded-full border-blue-400 border-8 h-32 w-32"></div>
+          <div className="absolute bottom-1/2 right-1/2  translate-x-1/2 translate-y-1/2">
+            <div className="h-32 w-32 animate-spin  rounded-full border-8 border-solid border-blue-400 border-t-transparent"></div>
           </div>
           <p className="relative top-32 text-lg font-bold">
             Waiting for anyone to join...

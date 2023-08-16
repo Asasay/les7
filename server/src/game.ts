@@ -6,7 +6,7 @@ export abstract class Game {
   player1: Player;
   player2!: Player;
   room: string;
-  board!: Player["badge"][];
+  board!: Player["badge"][][];
   constructor(socket: SocketType, roomPrefix: string) {
     this.player1 = { socket, badge: "O" };
     this.room = roomPrefix + this.player1.socket.id;
@@ -37,17 +37,63 @@ export abstract class Game {
 export class TicTacToe extends Game {
   start(): void {
     super.start();
+    this.player1.socket.to(this.room).emit("your turn");
     this.player2.socket.once("turn", this.handleTurn(this.player2, this));
   }
-  private handleTurn = (player: Player, game: TicTacToe) => (turn: string) => {
+  private handleTurn = (player: Player, game: TicTacToe) => (turn: number) => {
     const anotherPlayer = game.anotherPlayer(player);
-    game.board[Number(turn)] = player.badge;
+    game.board[Math.floor(turn / 3)][turn % 3] = player.badge;
     io.to(game.room).emit("board", game.board);
-    anotherPlayer.socket.once("turn", game.handleTurn(anotherPlayer, game));
+    const outcome = this.checkOutcome(player.badge);
+    if (outcome) io.to(game.room).emit("game over", outcome);
+    else {
+      player.socket.to(game.room).emit("your turn");
+      anotherPlayer.socket.once("turn", game.handleTurn(anotherPlayer, game));
+    }
+  };
+
+  private checkOutcome = (badge: Player["badge"]) => {
+    if (!this.board.flat().includes("")) return "Draw";
+    //rows
+    for (let i = 0; i < 3; i++) {
+      if (
+        this.board[i][0] == badge &&
+        this.board[i][1] == badge &&
+        this.board[i][2] == badge
+      )
+        return `Player ${badge} won!`;
+    }
+    //cols
+    for (let i = 0; i < 3; i++) {
+      if (
+        this.board[0][i] == badge &&
+        this.board[1][i] == badge &&
+        this.board[2][i] == badge
+      )
+        return `Player ${badge} won!`;
+    }
+    //across
+    if (
+      this.board[0][0] == badge &&
+      this.board[1][1] == badge &&
+      this.board[2][2] == badge
+    )
+      return `Player ${badge} won!`;
+    else if (
+      this.board[2][0] == badge &&
+      this.board[1][1] == badge &&
+      this.board[0][2] == badge
+    )
+      return `Player ${badge} won!`;
+    else return false;
   };
   constructor(socket: SocketType) {
     super(socket, "TicTacToe-");
-    this.board = new Array(9).fill("");
+    this.board = [
+      ["", "", ""],
+      ["", "", ""],
+      ["", "", ""],
+    ];
   }
 }
 

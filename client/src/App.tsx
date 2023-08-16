@@ -1,26 +1,37 @@
 import io from "socket.io-client";
-import { ConnectionState } from "./components/ConnectionState";
-import useSocket from "./hooks/useSocket";
-import Home from "./pages/Home";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import TicTacToe from "./pages/TicTacToe";
+import React from "react";
+
+const Home = React.lazy(() => import("./pages/Home"));
+const TicTacToe = React.lazy(() => import("./pages/TicTacToe"));
 
 export const socket = io();
 
 function App() {
-    return (
-        <BrowserRouter>
-            <main>
-                <Routes>
-                    <Route path="/" element={<Home socket={socket} />}></Route>
-                    <Route
-                        path="/tictactoe"
-                        element={<TicTacToe socket={socket} />}
-                    ></Route>
-                </Routes>
-            </main>
-        </BrowserRouter>
-    );
+  return (
+    <BrowserRouter>
+      <main>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <React.Suspense fallback={<>...</>}>
+                <Home socket={socket} />
+              </React.Suspense>
+            }
+          ></Route>
+          <Route
+            path="/tictactoe"
+            element={
+              <React.Suspense fallback={<>...</>}>
+                <TicTacToe socket={socket} />
+              </React.Suspense>
+            }
+          ></Route>
+        </Routes>
+      </main>
+    </BrowserRouter>
+  );
 }
 
 export default App;

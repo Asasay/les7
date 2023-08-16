@@ -9,16 +9,13 @@ const Home = ({ socket }: { socket: Socket }) => {
   const navigate = useNavigate();
   const isConnected = useSocket(socket);
 
-  const handleClick = (e) => {
-    navigate("/tictactoe");
-  };
   return (
     <div>
-      <Link to={"/tictactoe"}>
+      <Link to={"/tictactoe"} className="block text-center">
         <img
           src={TicTacLogo}
           alt="Tic-Tac-Toe logo"
-          className="h-52 hover:scale-105 duration-200"
+          className="inline-block h-52 duration-200 hover:scale-105"
         />
       </Link>
 

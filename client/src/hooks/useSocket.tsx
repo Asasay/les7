@@ -8,7 +8,6 @@ const useSocket = (socket: Socket<DefaultEventsMap, DefaultEventsMap>) => {
   useEffect(() => {
     socket.on("connect", () => {
       setIsConnected(true);
-      socket.emit("initialize");
     });
     socket.on("disconnect", () => setIsConnected(false));
     return () => {

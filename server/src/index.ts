@@ -1,11 +1,12 @@
 import express from "express";
+import compression from "compression";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import session from "express-session";
 import sqlite from "better-sqlite3";
-import "dotenv/config";
 import logger from "./logger";
 import { TicTacToe } from "./game";
+import "dotenv/config";
 
 const app = express();
 const httpServer = createServer(app);
@@ -35,9 +36,10 @@ const sessionMiddleware = session({
 });
 
 io.engine.use(sessionMiddleware);
+app.use(compression({ level: 1 }));
 app.use(express.static(__dirname + "/public"));
-app.get("/*", (req, res) => {
-  res.sendFile("index.html");
+app.get("*", (req, res) => {
+  res.sendFile(__dirname + "/public/index.html");
 });
 
 io.on("connection", (socket) => {

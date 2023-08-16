@@ -5,10 +5,12 @@ declare global {
   interface ServerToClientEvents {
     board: (board: Game["board"]) => void;
     "game start": (room: Game["room"]) => void;
+    "game over": (outcome: string) => void;
+    "your turn": () => void;
   }
 
   interface ClientToServerEvents {
-    turn: (turn: string) => void;
+    turn: (turn: number) => void;
     "join game": (this: SocketType) => void;
   }
 
