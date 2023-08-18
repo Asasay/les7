@@ -1,8 +1,7 @@
-import { DefaultEventsMap } from "@socket.io/component-emitter";
 import { useEffect, useState } from "react";
-import { Socket } from "socket.io-client";
+import { SocketType } from "../App";
 
-const useSocket = (socket: Socket<DefaultEventsMap, DefaultEventsMap>) => {
+const useConnectionStatus = (socket: SocketType) => {
   const [isConnected, setIsConnected] = useState(socket.connected);
 
   useEffect(() => {
@@ -18,4 +17,4 @@ const useSocket = (socket: Socket<DefaultEventsMap, DefaultEventsMap>) => {
   return isConnected;
 };
 
-export default useSocket;
+export default useConnectionStatus;

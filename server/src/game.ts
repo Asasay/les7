@@ -1,4 +1,4 @@
-import { io } from ".";
+import { SocketType, io } from ".";
 import logger from "./logger";
 
 export abstract class Game {

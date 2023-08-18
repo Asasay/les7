@@ -9,3 +9,15 @@ body {
   align-items: center;
   height: 100dvh;
 }
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: rgb(44, 48, 53);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  body {
+    background-color: #f3f4f6;
+  }
+}

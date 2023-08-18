@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Socket } from "socket.io-client";
+import { SocketType } from "../App";
 
-const TicTacToe = ({ socket }: { socket: Socket }) => {
+const TicTacToe = ({ socket }: { socket: SocketType }) => {
   const [gameStarted, setGameStarted] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [myTurn, setMyTurn] = useState("Waiting for another player to move");
@@ -29,11 +29,11 @@ const TicTacToe = ({ socket }: { socket: Socket }) => {
     if (gameStarted)
       return (
         <div>
-          <div className="grid grid-cols-3 grid-rows-3 border border-black">
+          <div className="grid grid-cols-3 grid-rows-3  border border-gray-400  text-2xl text-gray-900 dark:border-gray-600 dark:text-gray-200">
             {board.flatMap((innerArray, i) =>
               innerArray.map((cell, k) => (
                 <button
-                  className="min-h-[100px] min-w-[100px] border border-black text-2xl"
+                  className="min-h-[100px] min-w-[100px] border border-gray-400 dark:border-gray-600 dark:bg-gray-800"
                   key={i * 3 + k}
                   onClick={() => {
                     if (board[i][k] != "" || gameOver) return;
@@ -48,7 +48,9 @@ const TicTacToe = ({ socket }: { socket: Socket }) => {
               ))
             )}
           </div>
-          <p className="mt-3 text-lg">{myTurn}</p>
+          <p className="mt-3 text-lg text-gray-900 dark:text-gray-300">
+            {myTurn}
+          </p>
         </div>
       );
     else
@@ -57,7 +59,7 @@ const TicTacToe = ({ socket }: { socket: Socket }) => {
           <div className="absolute bottom-1/2 right-1/2  translate-x-1/2 translate-y-1/2">
             <div className="h-32 w-32 animate-spin  rounded-full border-8 border-solid border-blue-400 border-t-transparent"></div>
           </div>
-          <p className="relative top-32 text-lg font-bold">
+          <p className="relative top-32 text-lg font-bold text-gray-900 dark:text-gray-300">
             Waiting for anyone to join...
           </p>
         </div>

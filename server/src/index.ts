@@ -1,11 +1,11 @@
 import express from "express";
 import compression from "compression";
 import { createServer } from "http";
-import { Server } from "socket.io";
-import session from "express-session";
+import { Server, Socket } from "socket.io";
+import session, { Session } from "express-session";
 import sqlite from "better-sqlite3";
 import logger from "./logger";
-import { TicTacToe } from "./game";
+import { Game, TicTacToe } from "./game";
 import "dotenv/config";
 
 const app = express();
@@ -21,7 +21,7 @@ const port = process.env.SERVER_PORT;
 const SqliteStore = require("better-sqlite3-session-store")(session);
 const db = new sqlite("sessions.db", {});
 const sessionMiddleware = session({
-  secret: "changeit",
+  secret: "MhrVqZ62tymqHm3iRalh5xfoQwKSe6yD",
   store: new SqliteStore({
     client: db,
     expired: {
@@ -43,6 +43,19 @@ app.get("*", (req, res) => {
 });
 
 io.on("connection", (socket) => {
+  socket.on("username:get", (callback) => {
+    const sessionId = socket.request.session.id;
+    const savedUsername = socket.request.session.username;
+    callback({
+      username: savedUsername ? savedUsername : sessionId,
+    });
+  });
+
+  socket.on("username:set", (name) => {
+    socket.request.session.username = name;
+    socket.request.session.save();
+  });
+
   socket.on("disconnect", () => {
     if (
       TicTacToe.openedGameSession &&
@@ -62,14 +75,44 @@ io.on("connection", (socket) => {
   });
 });
 
-io.of("/").adapter.on("create-room", (room) => {
-  logger.debug(`room "${room}" was created`);
-});
-
-io.of("/").adapter.on("join-room", (room, id) => {
-  logger.debug(`socket ${id} has joined room "${room}"`);
-});
-
 httpServer.listen(port, () => {
   logger.info(`⚡️[server]: Server is running at port: ${port}`);
 });
+
+declare module "http" {
+  interface IncomingMessage {
+    cookieHolder?: string;
+    session: Session & {
+      username: string;
+    };
+  }
+}
+
+interface ServerToClientEvents {
+  board: (board: Game["board"]) => void;
+  "game start": (room: Game["room"]) => void;
+  "game over": (outcome: string) => void;
+  "your turn": () => void;
+}
+
+interface ClientToServerEvents {
+  turn: (turn: number) => void;
+  "join game": (this: SocketType) => void;
+  "username:get": (
+    callback: ({ username }: { username: string }) => void
+  ) => void;
+  "username:set": (name: string) => void;
+}
+
+interface InterServerEvents {
+  ping: () => void;
+}
+
+interface SocketData {}
+
+export type SocketType = Socket<
+  ClientToServerEvents,
+  ServerToClientEvents,
+  InterServerEvents,
+  SocketData
+>;
