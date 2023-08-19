@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 import { SocketType } from "../App";
+import Board from "../components/Board";
 
 const TicTacToe = ({ socket }: { socket: SocketType }) => {
   const [gameStarted, setGameStarted] = useState(false);
   const [gameOver, setGameOver] = useState(false);
-  const [myTurn, setMyTurn] = useState("Waiting for another player to move");
+  const [myTurn, setMyTurn] = useState<{
+    outcome: string;
+    winIndxs?: number[][];
+  }>({ outcome: "Waiting for another player to move" });
   const [board, setBoard] = useState<string[][]>(() => [
     ["", "", ""],
     ["", "", ""],
@@ -15,7 +19,7 @@ const TicTacToe = ({ socket }: { socket: SocketType }) => {
     socket.emit("join game");
     socket.once("game start", () => setGameStarted(true));
     socket.on("board", (board) => setBoard(board));
-    socket.on("your turn", () => setMyTurn("Your turn!"));
+    socket.on("your turn", () => setMyTurn({ outcome: "Your turn!" }));
     socket.on("game over", (outcome) => {
       setMyTurn(outcome);
       setGameOver(true);
@@ -29,27 +33,18 @@ const TicTacToe = ({ socket }: { socket: SocketType }) => {
     if (gameStarted)
       return (
         <div>
-          <div className="grid grid-cols-3 grid-rows-3  border border-gray-400  text-2xl text-gray-900 dark:border-gray-600 dark:text-gray-200">
-            {board.flatMap((innerArray, i) =>
-              innerArray.map((cell, k) => (
-                <button
-                  className="min-h-[100px] min-w-[100px] border border-gray-400 dark:border-gray-600 dark:bg-gray-800"
-                  key={i * 3 + k}
-                  onClick={() => {
-                    if (board[i][k] != "" || gameOver) return;
-                    else {
-                      socket.emit("turn", i * 3 + k);
-                      setMyTurn("Waiting for another player to move");
-                    }
-                  }}
-                >
-                  {cell}
-                </button>
-              ))
-            )}
-          </div>
+          <Board
+            board={board}
+            gameOver={gameOver}
+            socket={socket}
+            winIndxs={myTurn.winIndxs}
+            setMyTurn={setMyTurn}
+            height="300px"
+            width="300px"
+            className="border border-gray-400 dark:border-gray-600 dark:bg-gray-800"
+          />
           <p className="mt-3 text-lg text-gray-900 dark:text-gray-300">
-            {myTurn}
+            {myTurn.outcome}
           </p>
         </div>
       );

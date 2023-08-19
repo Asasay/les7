@@ -12,7 +12,7 @@ interface ServerToClientEvents {
   "game start": () => void;
   board: (board: string[][]) => void;
   "your turn": () => void;
-  "game over": (outcome: string) => void;
+  "game over": (outcome: { outcome: string; winIndxs: number[][] }) => void;
 }
 interface ClientToServerEvents {
   "username:get": () => Promise<{ username: string }>;

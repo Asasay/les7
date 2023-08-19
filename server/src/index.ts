@@ -36,7 +36,7 @@ const sessionMiddleware = session({
 });
 
 io.engine.use(sessionMiddleware);
-app.use(compression({ level: 1 }));
+app.use(compression());
 app.use(express.static(__dirname + "/public"));
 app.get("*", (req, res) => {
   res.sendFile(__dirname + "/public/index.html");
@@ -91,7 +91,7 @@ declare module "http" {
 interface ServerToClientEvents {
   board: (board: Game["board"]) => void;
   "game start": (room: Game["room"]) => void;
-  "game over": (outcome: string) => void;
+  "game over": (outcome: { outcome: string; winIndxs?: number[][] }) => void;
   "your turn": () => void;
 }
 
