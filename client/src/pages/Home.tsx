@@ -9,16 +9,32 @@ import { SocketType } from "../App";
 const Home = ({ socket }: { socket: SocketType }) => {
   const isConnected = useConnectionStatus(socket);
   const [username, setUsername] = useState<string>("");
+  const [ticTacOnline, setTicTacOnline] = useState(0);
 
   useEffect(() => {
     socket.emitWithAck("username:get").then((res) => setUsername(res.username));
-  }, []);
+  });
+
+  useEffect(() => {
+    const getOnline = () => {
+      socket
+        .emitWithAck("usersOnline", "TicTacToe")
+        .then((res) => setTicTacOnline(res));
+    };
+    getOnline();
+    const interval = setInterval(getOnline, 10000);
+    return () => clearInterval(interval);
+  });
 
   return (
     <div>
+      <p className="mb-4 text-center text-sm font-extralight text-gray-400">
+        People online: {ticTacOnline}
+      </p>
       <Link to={"/tictactoe"} className="mb-8 block text-center">
         <TicTacLogo className="inline-block h-52 w-auto duration-200 hover:scale-105 dark:fill-gray-300" />
       </Link>
+
       <label
         htmlFor="website-admin"
         className="mb-2 block text-sm font-medium text-gray-900 dark:text-gray-300"

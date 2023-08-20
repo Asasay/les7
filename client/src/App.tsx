@@ -15,6 +15,7 @@ interface ServerToClientEvents {
   "game over": (outcome: { outcome: string; winIndxs: number[][] }) => void;
 }
 interface ClientToServerEvents {
+  usersOnline: (...args: string[]) => Promise<number>;
   "username:get": () => Promise<{ username: string }>;
   "username:set": (username: string) => void;
   "join game": () => void;

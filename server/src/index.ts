@@ -43,6 +43,9 @@ app.get("*", (req, res) => {
 });
 
 io.on("connection", (socket) => {
+  socket.on("usersOnline", (game, callback) => {
+    callback(io.sockets.adapter.rooms.get(game)?.size || 0);
+  });
   socket.on("username:get", (callback) => {
     const sessionId = socket.request.session.id;
     const savedUsername = socket.request.session.username;
@@ -67,6 +70,7 @@ io.on("connection", (socket) => {
   logger.info("Connected sockets: " + [...io.of("/").adapter.sids.keys()]);
 
   socket.once("join game", function joinGame() {
+    socket.join("TicTacToe");
     if (!TicTacToe.openedGameSession) new TicTacToe(this);
     else {
       const game = TicTacToe.openedGameSession.join(this);
@@ -98,6 +102,7 @@ interface ServerToClientEvents {
 interface ClientToServerEvents {
   turn: (turn: number) => void;
   "join game": (this: SocketType) => void;
+  usersOnline: (game: string, callback: (n: number) => void) => void;
   "username:get": (
     callback: ({ username }: { username: string }) => void
   ) => void;
