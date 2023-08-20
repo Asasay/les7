@@ -13,7 +13,7 @@ const Home = ({ socket }: { socket: SocketType }) => {
 
   useEffect(() => {
     socket.emitWithAck("username:get").then((res) => setUsername(res.username));
-  });
+  }, []);
 
   useEffect(() => {
     const getOnline = () => {
@@ -24,7 +24,7 @@ const Home = ({ socket }: { socket: SocketType }) => {
     getOnline();
     const interval = setInterval(getOnline, 10000);
     return () => clearInterval(interval);
-  });
+  }, []);
 
   return (
     <div>
