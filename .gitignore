@@ -25,3 +25,4 @@ dist-ssr
 server/.env
 server/.env.development
 *.code-workspace
+server/sessions.db
