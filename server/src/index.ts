@@ -32,7 +32,7 @@ const sessionMiddleware = session({
 
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false, maxAge: 60 * 15 * 1000 },
+  cookie: { maxAge: 60 * 15 * 1000 },
 });
 
 io.engine.use(sessionMiddleware);
