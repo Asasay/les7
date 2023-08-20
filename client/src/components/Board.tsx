@@ -32,22 +32,34 @@ const Board: FC<Props> = ({
   ...props
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [canvasRect, setCanvasRect] = useState<DOMRect>();
+  const [canvasSize, setCanvasSize] = useState<{
+    width: number;
+    height: number;
+    left: number;
+    top: number;
+  }>();
   const [colorMode] = useDarkMode();
   useEffect(() => {
-    const rect = canvasRef?.current?.getBoundingClientRect();
-    if (!rect) return;
-    setCanvasRect(rect);
+    if (!canvasRef.current) return;
+    const computed = window.getComputedStyle(canvasRef?.current, null);
+    const rect = canvasRef.current.getBoundingClientRect();
+    setCanvasSize({
+      width: parseInt(computed.width),
+      height: parseInt(computed.height),
+      left: rect.left,
+      top: rect.top,
+    });
   }, [canvasRef]);
 
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
-    if (!ctx || !canvasRect) return;
-    const width = canvasRect.width;
-    const height = canvasRect.height;
+    if (!ctx || !canvasSize) return;
+
+    const width = canvasSize.width;
+    const height = canvasSize.height;
     const cellWidth = width / board.length;
     const cellHeight = height / board.length;
-
+    ctx.clearRect(0, 0, width, height);
     ctx.strokeStyle = "rgb(75 85 99)";
     ctx.lineWidth = colorMode == "dark" ? 1 : 0.4;
     ctx.fillStyle = colorMode == "dark" ? "rgb(209 213 219)" : "black";
@@ -70,6 +82,7 @@ const Board: FC<Props> = ({
       const row = board[i];
       for (let k = 0; k < row.length; k++) {
         const cell = row[k];
+        if (cell == "") continue;
         ctx.fillText(
           cell,
           k * cellWidth + cellWidth / 2,
@@ -92,15 +105,15 @@ const Board: FC<Props> = ({
       );
       ctx.stroke();
     }
-  }, [canvasRef, canvasRect, board, winIndxs, colorMode]);
+  }, [canvasRef, canvasSize, board, winIndxs, colorMode]);
 
   const handleClick: MouseEventHandler = (e) => {
-    if (!canvasRect || gameOver) return;
-    const width = canvasRect.width;
-    const height = canvasRect.height;
+    if (!canvasSize || gameOver) return;
+    const width = canvasSize.width;
+    const height = canvasSize.height;
     const pos = {
-      x: e.clientX - canvasRect.left,
-      y: e.clientY - canvasRect.top,
+      x: e.clientX - canvasSize.left,
+      y: e.clientY - canvasSize.top,
     };
     const cellIndex = {
       x: Math.floor((pos.x / width) * board.length),

@@ -41,7 +41,7 @@ const TicTacToe = ({ socket }: { socket: SocketType }) => {
             setMyTurn={setMyTurn}
             height="300px"
             width="300px"
-            className="border border-gray-400 dark:border-gray-600 dark:bg-gray-800"
+            className="border box-content border-gray-400 dark:border-gray-600 dark:bg-gray-800"
           />
           <p className="mt-3 text-lg text-gray-900 dark:text-gray-300">
             {myTurn.outcome}
