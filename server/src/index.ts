@@ -17,7 +17,7 @@ export const io = new Server<
   SocketData
 >(httpServer);
 
-const port = process.env.SERVER_PORT;
+const port = process.env.PORT;
 const SqliteStore = require("better-sqlite3-session-store")(session);
 const db = new sqlite("sessions.db", {});
 const sessionMiddleware = session({

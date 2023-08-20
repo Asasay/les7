@@ -72,7 +72,6 @@ export class TicTacToe extends Game {
     };
 
   private checkOutcome = (badge: TicTacToePlayer["badge"]) => {
-    if (!this.board.flat().includes("")) return { outcome: "Draw" };
     //rows
     for (let i = 0; i < 3; i++) {
       if (
@@ -128,6 +127,8 @@ export class TicTacToe extends Game {
           [0, 2],
         ],
       };
+
+    if (!this.board.flat().includes("")) return { outcome: "Draw" };
     else return false;
   };
 }
