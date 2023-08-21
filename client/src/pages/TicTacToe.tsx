@@ -3,6 +3,21 @@ import { SocketType } from "../App";
 import Board from "../components/Board";
 
 const TicTacToe = ({ socket }: { socket: SocketType }) => {
+  useEffect(() => {
+    window.addEventListener("beforeunload", handleLeave);
+    return () => {
+      window.removeEventListener("beforeunload", handleLeave);
+    };
+  }, []);
+
+  useEffect(() => {
+    return handleLeave;
+  }, []);
+
+  const handleLeave = () => {
+    socket.emit("leave game");
+  };
+
   const [gameStarted, setGameStarted] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [myTurn, setMyTurn] = useState<{
@@ -41,7 +56,7 @@ const TicTacToe = ({ socket }: { socket: SocketType }) => {
             setMyTurn={setMyTurn}
             height="300px"
             width="300px"
-            className="border box-content border-gray-400 dark:border-gray-600 dark:bg-gray-800"
+            className="box-content border border-gray-400 dark:border-gray-600 dark:bg-gray-800"
           />
           <p className="mt-3 text-lg text-gray-900 dark:text-gray-300">
             {myTurn.outcome}

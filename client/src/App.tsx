@@ -19,6 +19,7 @@ interface ClientToServerEvents {
   "username:get": () => Promise<{ username: string }>;
   "username:set": (username: string) => void;
   "join game": () => void;
+  "leave game": () => void;
   turn: (turn: number) => void;
 }
 

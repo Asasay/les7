@@ -102,6 +102,7 @@ interface ServerToClientEvents {
 interface ClientToServerEvents {
   turn: (turn: number) => void;
   "join game": (this: SocketType) => void;
+  "leave game": () => void;
   usersOnline: (game: string, callback: (n: number) => void) => void;
   "username:get": (
     callback: ({ username }: { username: string }) => void
